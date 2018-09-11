@@ -46,7 +46,7 @@ The goals / steps of this project are the following:
 
 #### 1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
      
-The code for this step is contained in the first cell of the "Calibrating the Camera" section of the IPython notebook located in the [Main](./main.ipynb) IPython Notebook.
+The code for this step is contained in the first cell of the "Calibrating the Camera" section of the [Main](./main.ipynb) IPython Notebook.
 
 I start by creating two empty lists of object points and image points. The object points will contain points in 3-D space and will be used with the `cv2.calibrateCamera` function. I create an object point (x, y, z) that has all z values set to 0 and will be appended to the array of objects points each time an image's corners is successfully detected with `cv2.findChessboardCorners`. 
 
@@ -78,7 +78,7 @@ Undistorted Test Image with Source Points             |  Warped Image
 :-------------------------:|:-------------------------:
 ![Undistorted Test Image with Source Points Drawn][before-birds-eye-view]  |  ![Birds Eye View of Test Image][after-birds-eye-view]
 
-I chose to code the source and destination points are hardcoded in the following manner:
+I chose to hardcode the source and destination points in the following manner:
 
 ```python
     src = np.float32(
@@ -113,7 +113,7 @@ HLS Full                   |  White and Yellow Accentuated            |  Sobel X
 :-------------------------:|:----------------------------------------:|:-------------------------:|:-------------------------:
 ![HLS Full][hls-full]      |  ![White and Yellow Attenuated][w-and-y] | ![Sobel X][sobel-x]       | ![Combined Result][accentuated] 
 
-The pipeline for this step is to first convert the image to HLS Full format, use thresholds that filter out all but white and yellow colors of the HLS Full image, apply a Sobel X gradient to the HLS Full image, and combine the results of the Sobel X gradient and the HLS Full White and Yellow accentuating. 
+The pipeline for this step is to first convert the image to HLS Full format, use thresholds that filter out all but white and yellow colors of the HLS Full image, apply a Sobel X gradient to the HLS Full image, and combine the results of the Sobel X gradient thresholding and the HLS Full White and Yellow accentuating into one binary image. 
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
@@ -123,9 +123,9 @@ Our pipeline initiates the lane line detection by calling the `identifyLaneLines
 
 ##### Window Search
 
-Internally, the `windowSearch` function works by calling a `find_lane_pixels` function that takes a histogram of the bottom half of the image and assigning a "base left x" and "base right x" based on the frequency of x values in the histogram. Once these bases are used to initialize "left x current" and "right x current", I iterate through the user specified number of windows (`nwindows`) and create the bounds of a window from a margin and from the current left and right x coordinates. Any nonzero pixels within the bounds of this window are recorded in "good left lane indices" and "good right lane indices". These indices are added to the list of indices found for each lane in each window (`left_lane_inds` and `right_lane_inds`, respectively). If the number of good indices found is over the number of minumum pixels requires to recenter the window, the left and right current x positions are updated to reflect this shift. 
+Internally, the `windowSearch` function works by calling a `find_lane_pixels` function that takes a histogram of the bottom half of the image and assigns a "base left x" and "base right x" based on the frequency of x values in the histogram. Once these bases are used to initialize "left x current" and "right x current", I iterate through the user specified number of windows (`nwindows`) and create the bounds of a window from a specified margin and from the current left and right x coordinates. Any nonzero pixels within the bounds of this window are recorded in "good left lane indices" and "good right lane indices". These indices are added to the list of indices found for each lane in each window (`left_lane_inds` and `right_lane_inds`, respectively). If the number of good indices found is over the number of minumum pixels required to recenter the window, the left and right current x positions are updated to reflect this shift. 
 
-Once each window has been processed, the left and right line pixel positions are assigned to the values corresponding to the good indices found within the windows. These pixels are 
+Once each window has been processed, the left and right line pixel positions are assigned to the values corresponding to the good indices found within the windows. These pixels are then used to create a polynomial representing the line via the `fitPoly` function of the `Line` object (see [Line Helper Class](#Line-Helper-Class) below).
 
 Below is an example image detailing the result of this process. The windows are bounded with green rectangles and the good indices are colored in red for left and blue for right.
 
@@ -197,12 +197,12 @@ Here I'll talk about the approach I took, what techniques I used, what worked an
 
 ##### The Approach
 
-The approach I took involved transforming a given image to a warped perspective (one that captures the lane lines) and converting to HLS Full color space and accentuating all white and yellow colors. In the event that the lines are not yellow/white or the lines are not picked up by the HLS Full mask, a Sobel gradient was taken along the x-direction. I combine the results of the gradient and color thresholding into a binary image.
+The approach I took involved transforming a given image to a warped perspective (one that captures the lane lines) and converting to HLS Full color space and accentuating all white and yellow colors. Separately, a Sobel gradient is taken along the x-direction. I combine the results of the gradient and color thresholding into a binary image.
 
 This resulting binary image is ran through a lane line detection algorithm that applies a window search or a previous detection search to locate the (x, y) points that correspond to each lane line. These points are then used to generate polynomials that represent each lane line. The polynomials are then mapped to the image and a lane visualization is created on the binary image. This binary image, which only holds the lane line visualization and the mapped polynomials, is warped back into a normal perspective and overlayed over the original image.
 
 ##### Future Improvements / Causes of Potential Failure
 
-Possible factors that can cause failure include: images that are not the width and height that this pipeline was tuned on, a line of cars in the lane could throw off the detection, changing lanes, and frequent sharp curves in varying directions. Selecting the source and destination points was done statically based on the width and height of the project video images. Fixing this issue would entail running a pipeline that does not leverage a warped perspective and using those detected lines to then determine the source and destination warp points. 
+Possible factors that can cause failure include: images that are not the width and height that this pipeline was tuned on, a line of cars in the lane could throw off the detection, changing lanes, and frequent sharp curves in varying directions. Selecting the source and destination points was done statically based on the width and height of the project video images. Fixing this issue would entail running a pipeline that does not leverage a warped perspective to detect the intial lane lines and then using those lines to determine the source and destination warp points for subsequent images. 
 
 One way to make the pipeline more robust would be to apply weights to each detected lane line polynomial instead of taking the average of the last few polynomials. Weights could be determined from a combination of how much the new polynomial varies from the previous ones and how abnormal the radius of curvature of it is. Also, if one lane line is found to be abnormal and the other is not, perhaps the expected lane line could contribute to the weight of the abnormal lane line.
