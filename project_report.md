@@ -46,7 +46,7 @@ The goals / steps of this project are the following:
 
 #### 1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
      
-The code for this step is contained in the first cell of the "Calibrating the Camera" section of the IPython notebook located in "./main.ipynb".
+The code for this step is contained in the first cell of the "Calibrating the Camera" section of the IPython notebook located in the [Main](./main.ipynb) IPython Notebook.
 
 I start by creating two empty lists of object points and image points. The object points will contain points in 3-D space and will be used with the `cv2.calibrateCamera` function. I create an object point (x, y, z) that has all z values set to 0 and will be appended to the array of objects points each time an image's corners is successfully detected with `cv2.findChessboardCorners`. 
 
@@ -68,11 +68,11 @@ Distorted             |  Undistorted
 :-------------------------:|:-------------------------:
 ![Distorted Test Image][dist-test]  |  ![Undistorted Test Image][undist-test]
 
-Distortion correction is achieved by passing in the camera calibration matrix and distortion coefficients to `cv2.undistort` via the `distortionCorrection` function found in "./main.ipynb".
+Distortion correction is achieved by passing in the camera calibration matrix and distortion coefficients to `cv2.undistort` via the `distortionCorrection` function found in the [Main](./main.ipynb) IPython Notebook.
 
 #### 2. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
     
-The code for my perspective transform includes a function called `applyPerspectiveTransform()`, which appears in the 1st code cell under the "Applying and Reversing Bird's Eye View Perspective Transform" heading in "./main.ipynb" IPython notebook. The `applyPerspectiveTransform()` function takes as inputs an image (`img`) as well as source (`src`) and destination (`dst`) points. These points are used with `cv2.getPerspectiveTransform` function to get a transformation matrix. I apply this matrix to the image via the `cv2.warpPerspective` function to get a birds eye view image, as seen below.
+The code for my perspective transform includes a function called `applyPerspectiveTransform()`, which appears in the 1st code cell under the "Applying and Reversing Bird's Eye View Perspective Transform" heading in the [Main](./main.ipynb) IPython Notebook. The `applyPerspectiveTransform()` function takes as inputs an image (`img`) as well as source (`src`) and destination (`dst`) points. These points are used with `cv2.getPerspectiveTransform` function to get a transformation matrix. I apply this matrix to the image via the `cv2.warpPerspective` function to get a birds eye view image, as seen below.
 
 Undistorted Test Image with Source Points             |  Warped Image
 :-------------------------:|:-------------------------:
@@ -105,19 +105,19 @@ This resulted in the following source and destination points for an image with w
 
 #### 3. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color transformations, color thresholds, and gradient thresholds to generate a binary image. The code can be found in the [Accentuating Lane Lines]["./AccentauteLaneLines.ipynb"] IPython notebook.
+I used a combination of color transformations, color thresholds, and gradient thresholds to generate a binary image. The code can be found in the [Accentuating Lane Lines](./AccentauteLaneLines.ipynb) IPython notebook.
 
 Several images showcasing each stage of this step is given below:
 
 HLS Full                   |  White and Yellow Accentuated            |  Sobel X Gradient         | Combined Result
-:-------------------------:|:-------------------------               :|:-------------------------:|:-------------------------:
+:-------------------------:|:----------------------------------------:|:-------------------------:|:-------------------------:
 ![HLS Full][hls-full]      |  ![White and Yellow Attenuated][w-and-y] | ![Sobel X][sobel-x]       | ![Combined Result][accentuated] 
 
 The pipeline for this step is to first convert the image to HLS Full format, use thresholds that filter out all but white and yellow colors to the HLS Full image, apply a Sobel X gradient to the HLS Full image, and combine the results of the Sobel X gradient and the HLS Full White and Yellow accentuating.
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-Identifying lane pixels from a binary image and fitting their positions with a polynomial is done in the cells beneath the "Finding Lane Pixels from a Window Search" of the [Main Python Notebook][./main.ipynb].
+Identifying lane pixels from a binary image and fitting their positions with a polynomial is done in the cells beneath the "Finding Lane Pixels from a Window Search" of the [Main Python Notebook](./main.ipynb).
 
 Our pipeline calls the `attenuateLaneLines` (the first cell under the 
 
